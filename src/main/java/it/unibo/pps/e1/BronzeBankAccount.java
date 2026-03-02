@@ -1,5 +1,7 @@
 package it.unibo.pps.e1;
 
+import java.util.function.Function;
+
 public class BronzeBankAccount implements BankAccount {
     private final CoreBankAccount base;
 
@@ -16,10 +18,9 @@ public class BronzeBankAccount implements BankAccount {
     }
 
     public void withdraw(int amount) {
-        int fee = amount < 100 ? 0 : 1;
-        if (this.getBalance() <= amount + fee){
+        if (this.getBalance() <= amount){
             throw new IllegalStateException();
         }
-        base.withdraw(amount + fee);
+        base.withdraw(amount);
     }
 }
