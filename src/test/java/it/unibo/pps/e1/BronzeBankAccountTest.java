@@ -2,47 +2,28 @@ package it.unibo.pps.e1;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BronzeBankAccountTest {
-
-    public static final int BASE_AMOUNT = 1000;
-    public static final int FEE = 1;
-    private BronzeBankAccount account;
+public class BronzeBankAccountTest extends BankAccountTest {
 
     @BeforeEach
     void init(){
-        CoreBankAccount base = new CoreBankAccount(fee -> fee > 100 ?  FEE : 0);
-        this.account = new BronzeBankAccount(base);
+        this.account = new BronzeBankAccount(new CoreBankAccount(fee -> fee >= 100 ?  FEE : 0));
     }
 
-    @Test
-    public void testInitiallyEmpty() {
-        assertEquals(0, this.account.getBalance());
-    }
-
-    @Test
-    public void testCanDeposit() {
-        this.account.deposit(BASE_AMOUNT);
-        assertEquals(BASE_AMOUNT, this.account.getBalance());
-    }
-
-    @Test
-    public void testCanWithdraw() {
-        this.account.deposit(BASE_AMOUNT);
-        int withdrawAmount = 200;
-        this.account.withdraw(withdrawAmount);
-        assertEquals(BASE_AMOUNT - withdrawAmount - FEE, this.account.getBalance());
-    }
-
-    @Test
-    public void testCanWithdrawLessThanOneHundred() {
-        this.account.deposit(BASE_AMOUNT);
-        int withdrawAmount = 50;
-        this.account.withdraw(withdrawAmount);
-        assertEquals(BASE_AMOUNT - withdrawAmount, this.account.getBalance());
+    @ParameterizedTest
+    @CsvSource({
+            "1000, 50, 950",
+            "1000, 100, 899"
+    })
+    public void testCanWithdraw(final int balance, final int withdraw, final int result) {
+        this.account.deposit(balance);
+        this.account.withdraw(withdraw);
+        assertEquals(result, this.account.getBalance());
     }
 
     @Test
@@ -51,5 +32,4 @@ public class BronzeBankAccountTest {
         int withdrawAmount = 1600;
         assertThrows(IllegalStateException.class, () -> this.account.withdraw(withdrawAmount));
     }
-
 }

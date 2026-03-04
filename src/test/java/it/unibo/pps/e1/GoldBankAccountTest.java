@@ -2,30 +2,17 @@ package it.unibo.pps.e1;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GoldBankAccountTest {
-
-    public static final int BASE_AMOUNT = 1000;
-    private GoldBankAccount account;
+public class GoldBankAccountTest extends BankAccountTest {
 
     @BeforeEach
     void init(){
-        CoreBankAccount base = new CoreBankAccount(fee -> 0);
-        this.account = new GoldBankAccount(base);
-    }
-
-    @Test
-    public void testInitiallyEmpty() {
-        assertEquals(0, this.account.getBalance());
-    }
-
-    @Test
-    public void testCanDeposit() {
-        this.account.deposit(BASE_AMOUNT);
-        assertEquals(BASE_AMOUNT, this.account.getBalance());
+        this.account = new GoldBankAccount(new CoreBankAccount(fee -> 0));
     }
 
     @Test
@@ -36,19 +23,21 @@ public class GoldBankAccountTest {
         assertEquals(BASE_AMOUNT - withdrawAmount, this.account.getBalance());
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "1000, 200, 800",
+            "1000, 1400, -400"
+    })
+    public void testCanWithdraw(final int balance, final int withdraw, final int result) {
+        this.account.deposit(balance);
+        this.account.withdraw(withdraw);
+        assertEquals(result, this.account.getBalance());
+    }
+
     @Test
-    public void testCannotWithdrawMoreThanAvailable(){
+    public void testCanWithdrawMoreThanOverdraft(){
         this.account.deposit(BASE_AMOUNT);
         int withdrawAmount = 1600;
         assertThrows(IllegalStateException.class, () -> this.account.withdraw(withdrawAmount));
     }
-
-    @Test
-    public void testCanWithdrawMoreThanActualBalace() {
-        this.account.deposit(BASE_AMOUNT);
-        int withdrawAmount = 1200;
-        this.account.withdraw(withdrawAmount);
-        assertEquals(BASE_AMOUNT - withdrawAmount, this.account.getBalance());
-    }
-
 }
