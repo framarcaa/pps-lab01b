@@ -18,7 +18,7 @@ public class Knight implements Piece{
         int y = col-this.position.getY();
         if (x!=0 && y!=0 && Math.abs(x)+Math.abs(y)==3) {
             setPosition(new Pair<>(row, col));
-            return pawn.getPosition().equals(this.position);
+            return true;
         }
         return false;
     }

@@ -6,17 +6,18 @@ public class LogicsImpl implements Logics {
 	
 	private final Pawn pawn;
 	private final Knight knight;
+    private final Board board;
 	private final Random random = new Random();
-	private final int size;
+	private final int SIZE = 5;
 
-    public LogicsImpl(int size, Pawn pawn, Knight knight) {
-        this.size = size;
+    public LogicsImpl(Pawn pawn, Knight knight) {
         this.pawn = pawn;
         this.knight = knight;
+        this.board = new BoardImpl(SIZE);
     }
 
-    public LogicsImpl(int size){
-    	this.size = size;
+    public LogicsImpl(){
+        this.board = new BoardImpl(SIZE);
         this.pawn = new Pawn();
         this.pawn.setPosition(this.randomEmptyPosition());
         this.knight = new Knight();
@@ -24,17 +25,20 @@ public class LogicsImpl implements Logics {
     }
 
 	private Pair<Integer,Integer> randomEmptyPosition(){
-    	Pair<Integer,Integer> pos = new Pair<>(this.random.nextInt(size),this.random.nextInt(size));
+    	Pair<Integer,Integer> pos = new Pair<>(this.random.nextInt(this.board.getSize()),this.random.nextInt(this.board.getSize()));
     	// the recursive call below prevents clash with an existing pawn
     	return this.pawn.getPosition()!=null && this.pawn.getPosition().equals(pos) ? randomEmptyPosition() : pos;
     }
     
 	@Override
 	public boolean hit(int row, int col) {
-		if (row<0 || col<0 || row >= this.size || col >= this.size) {
+		if (this.board.positionIsInBoard(new Pair<>(row, col))) {
 			throw new IndexOutOfBoundsException();
 		}
-        return this.knight.canMove(row, col, this.pawn);
+        if (this.knight.canMove(row, col, this.pawn)) {;
+            return this.pawn.getPosition().equals(this.knight.getPosition());
+        }
+        return false;
 	}
 
 	@Override

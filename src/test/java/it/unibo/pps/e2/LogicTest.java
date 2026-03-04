@@ -13,7 +13,7 @@ public class LogicTest {
         pawn.setPosition(new Pair<>(0, 0));
         Knight knight = new Knight();
         knight.setPosition(new Pair<>(1, 2));
-        logic = new LogicsImpl(SIZE, pawn, knight);
+        logic = new LogicsImpl(pawn, knight);
     }
     @Test
     public void testPawnInBoard() {
